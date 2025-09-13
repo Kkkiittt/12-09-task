@@ -1,4 +1,6 @@
 ﻿
+using System.Web.Mvc;
+
 using CRM.Application.Dtos;
 using CRM.Application.Interfaces.Data;
 using CRM.Application.Interfaces.Services;
@@ -11,9 +13,13 @@ namespace CRM.Application.Implementations.Services;
 public class StudentService : IStudentService
 {
 	private readonly IDatabase _db;
-	public StudentService(IDatabase db)
+	private readonly ICodeService _code;
+	private readonly IFileService _file;
+	public StudentService(IDatabase db, ICodeService code, IFileService file)
 	{
 		_db = db;
+		_code = code;
+		_file = file;
 	}
 
 	public async Task<bool> CreateAsync(Student entity)
@@ -24,6 +30,13 @@ public class StudentService : IStudentService
 			conn.Open();
 			return await conn.ExecuteAsync(query, entity) > 0;
 		}
+	}
+
+	public byte[] GenerateQrCode(int studentId)
+	{
+		string path = "https://localhost:7194/students/detailed" + studentId;
+		var file = _code.GenerateCode(path);
+		return file;
 	}
 
 	public async Task<IEnumerable<Student>> GetAllAsync()
@@ -69,7 +82,7 @@ public class StudentService : IStudentService
 
 	public async Task<IEnumerable<StudentSearchGetDto>> SearchAsync(string name, int courseId, double paymentSum)
 	{
-		Console.WriteLine("|"+name+"|");
+		Console.WriteLine("|" + name + "|");
 		string query = $"""
 			select
 				s.name as studentname,

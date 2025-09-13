@@ -46,7 +46,21 @@ public class StudentController : ControllerBase
 	[HttpGet("search")]
 	public async Task<IActionResult> Search(string? name, int courseId, double paymentSum)
 	{
-		var students = await _studentService.SearchAsync(name??"", courseId, paymentSum);
+		var students = await _studentService.SearchAsync(name ?? "", courseId, paymentSum);
 		return students != null ? Ok(students) : NotFound();
+	}
+
+	[HttpGet("qr/{id}")]
+	public IActionResult GenerateQrCode(int id)
+	{
+		return File(_studentService.GenerateQrCode(id), "image/png");
+	}
+
+	[HttpGet("detailed/{id}")]
+	public async Task<IActionResult> GetDetailedAsync(int id)
+	{
+		var studName = (await _studentService.GetAsync(id)).Name;
+		var student = (await _studentService.GetStudentsDetailedAsync()).Where(x => x.StudentName == studName).FirstOrDefault();
+		return student != null ? Ok(student) : NotFound();
 	}
 }

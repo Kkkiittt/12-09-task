@@ -26,6 +26,8 @@ builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IAttendanceService, AttendanceService>();
 builder.Services.AddScoped<IStudentGroupService, StudentGroupService>();
+builder.Services.AddScoped<ICodeService, CodeService>(); 
+builder.Services.AddScoped<IFileService, FileService>();
 
 var app = builder.Build();
 
